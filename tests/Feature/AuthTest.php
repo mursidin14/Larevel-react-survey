@@ -112,6 +112,6 @@ class AuthTest extends TestCase
                     'email or password is wrong'
                 ]
             ]
-                ]);
+         ]);
     }
 }

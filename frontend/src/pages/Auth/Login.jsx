@@ -1,5 +1,5 @@
 import { useState } from "react";
-// import { axiosClient } from "../../api/axios";
+import { axiosClient } from "../../api/axios";
 import { useUserContext } from "../../context/UserContext";
 import { Spinner } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
@@ -9,7 +9,7 @@ import { Alert } from "flowbite-react";
 export default function Login() {
   const { setUser, setToken } = useUserContext();
   const [userData, setUserData] = useState({
-    username:'',
+    email:'',
     password: '',
   });
   const [error, setError] = useState('');
@@ -23,28 +23,28 @@ export default function Login() {
     });
   };
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     if(userData.password.length < 6){
-//       setError("password must be at least 6 character");
-//       setLoading(false);
-//     } else {
-//       axiosClient.post("/users/login", userData)
-//       .then(({data}) => {
-//         setUser(data.data)
-//         setToken(data.data.token)
-//       }).catch((error) => {
-//           const res = error.response;
-//           console.log(res)
-//           const msg = res.data.errors.message;
-//           if(res.status == 401) {
-//               setError(msg)
-//               setLoading(false);
-//           }
-//       }) 
-//     }
-//   }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    if(userData.password.length < 6){
+      setError("password must be at least 6 character");
+      setLoading(false);
+    } else {
+      axiosClient.post("/users/login", userData)
+      .then(({data}) => {
+        setUser(data.data)
+        setToken(data.data.token)
+      }).catch((error) => {
+          const res = error.response;
+          console.log(res)
+          const msg = res.data.errors.message;
+          if(res.status == 401) {
+              setError(msg)
+              setLoading(false);
+          }
+      }) 
+    }
+  }
 
 
   return (
@@ -55,24 +55,24 @@ export default function Login() {
           <p>If you dont have an account register You can<br />  
             <a href='/register' className='text-blue-800'> Register here !</a>
           </p>
-          {/*
+          {
               error &&  
               <Alert color="failure" icon={HiInformationCircle} onDismiss={() => setError(false)}>
                   <span className="font-medium">{error}</span> 
               </Alert>
-          */}
+          }
           <form 
-        //   onSubmit={handleSubmit} 
+          onSubmit={handleSubmit} 
           className="space-y-5">
             <div className="form-login relative">
-              <label className='text-slate-500'>Username</label>
+              <label className='text-slate-500'>Email</label>
               <input 
-                name="username"
-                // value={userData.username}
-                // onChange={handleChange}
+                name="email"
+                value={userData.email}
+                onChange={handleChange}
                 className='outline-none w-80 py-2 px-3 border rounded-md'
-                type='text' 
-                placeholder='Enter your username' 
+                type='email' 
+                placeholder='Enter your email' 
                 required
                 />
             </div>
@@ -81,8 +81,8 @@ export default function Login() {
                 <label className='text-slate-500'>Password</label>
                 <input 
                   name="password"
-                //   value={userData.password}
-                //   onChange={handleChange}
+                  value={userData.password}
+                  onChange={handleChange}
                   className='outline-none w-80 py-2 px-3 border rounded-md'
                   type='password' 
                   placeholder='Enter your password' 
@@ -98,13 +98,13 @@ export default function Login() {
              </div>
 
              {
-            //   loading ? 
-            //   <button 
-            //     className='bg-blue-800 text-white w-full h-10 mt-16 rounded-full shadow-lg shadow-blue-500/40'
-            //     >
-            //     <Spinner aria-label="Loading register" size="sm" />
-            //     <span className="pl-3">Loading...</span>
-            //   </button> :
+              loading ? 
+              <button 
+                className='bg-blue-800 text-white w-full h-10 mt-16 rounded-full shadow-lg shadow-blue-500/40'
+                >
+                <Spinner aria-label="Loading register" size="sm" />
+                <span className="pl-3">Loading...</span>
+              </button> :
               <button 
                 type="submit"
                 className='bg-blue-800 text-white w-full h-10 mt-16 rounded-full shadow-lg shadow-blue-500/40'
