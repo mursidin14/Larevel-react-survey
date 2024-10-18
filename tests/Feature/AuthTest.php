@@ -114,4 +114,126 @@ class AuthTest extends TestCase
             ]
          ]);
     }
+
+    public function testGetUser()
+    {
+        $this->seed([UserSeeder::class]);
+        $this->get('api/users', [
+            'Authorization' => '_token'
+        ])->assertStatus(200)
+          ->assertJson([
+            'data' => [
+                'email' => 'test@gmail.com',
+                'name' => 'testing'
+            ]
+          ]);
+    }
+
+    public function testGetUnauthorization()
+    {
+        $this->seed([UserSeeder::class]);
+        $this->get('api/users', [
+        ])->assertStatus(401)
+          ->assertJson([
+            'errors' => [
+                'message' => [
+                    'unauthorization'
+                ]
+            ]
+          ]);
+    }
+
+    public function testWrongToken()
+    {
+        $this->seed([UserSeeder::class]);
+        $this->get('api/users', [
+            'Authorization' => 'salah'
+        ])->assertStatus(401)
+          ->assertJson([
+            'errors' => [
+                'message' => [
+                    'unauthorization'
+                ]
+            ]
+          ]);
+    }
+
+    public function testUpdatePasswordSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+        $oldUser = User::where('email', 'test@gmail.com')->first();
+
+        $this->patch('api/users', [
+            'password' => 'baru'
+        ],
+        [
+            'Authorization' => '_token'
+        ]
+    )->assertStatus(200)
+     ->assertJson([
+        'data' => [
+            'email' => 'test@gmail.com',
+            'name' => 'testing'
+        ]
+     ]);
+
+     $newUser = User::query()->where('email', 'test@gmail.com')->first();
+     self::assertNotEquals($oldUser->password, $newUser->password);
+    }
+
+    public function testNameUpdateSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+        $oldUser = User::query()->where('email', 'test@gmail.com')->first();
+
+        $this->patch('api/users', [
+            'name' => 'mure'
+        ],
+        [
+            'Authorization' => '_token'
+        ]
+    )->assertStatus(200)
+     ->assertJson([
+        'data' => [
+            'email' => 'test@gmail.com',
+            'name' => 'mure'
+        ]
+     ]);
+
+     $newUser = User::query()->where('email', 'test@gmail.com')->first();
+     self::assertNotEquals($oldUser->name, $newUser->name);
+    }
+
+
+    public function testLogoutSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->delete( uri: '/api/users', headers: [
+            'Authorization' => '_token'
+        ])->assertStatus(200)
+          ->assertJson([
+                'data' => true
+          ]);
+
+          $user = User::query()->where('email', 'test@gmail.com')->first();
+          self::assertNull($user->token);
+    }
+
+    public function testLogoutFiled()
+    {
+        $this->seed([UserSeeder::class]);
+
+        $this->delete( uri: '/api/users', headers: [
+            'Authorization' => 'salah'
+        ])->assertStatus(401)
+          ->assertJson([
+                'errors' => [
+                    'message' => [
+                        'unauthorization'
+                    ]
+                ]
+          ]);
+
+    }
 }

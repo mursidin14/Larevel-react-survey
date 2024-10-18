@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -55,6 +56,30 @@ class AuthController extends Controller
         $user->save();
 
         return (new UserResource($user))->response()->setStatusCode(201);
+    }
+
+    public function getUser(Request $request): UserResource
+    {
+        $user = Auth::user();
+
+        return new UserResource($user);
+    }
+
+    public function update(UserUpdateRequest $request): UserResource
+    {
+        $data = $request->validated();
+        $user = Auth::user();
+        
+        if(isset($data['name'])){
+            $user->name = $data['name'];
+        }
+
+        if(isset($data['password'])){
+            $user->password = Hash::make($data['password']);
+        }
+        
+        $user->save();
+        return new UserResource($user);
     }
 
     public function logout(Request $request)
